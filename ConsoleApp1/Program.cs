@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +34,12 @@ namespace ConsoleApp1
         static int pointer = 1;
         static bool In_Menu = true;
         static bool Will_Return = true;
+        static string[] ToBeOutput;
+        static bool In_Settings = false;
+        static string[] SettingChoices = new string[3] { "", "Change Field Size", "Return" };
+        static ConsoleKeyInfo r;
+        static int low, high;
+        static bool manualfield = false;
         static void Main(string[] args)
         {
             Menu();
@@ -69,39 +75,32 @@ namespace ConsoleApp1
         }
         static void Menu_Ausgabe()
         {
+            string[] Choices = new string[5] {"","Play","Information","Options","Exit"};
             while (In_Menu )
             {
                 if (Will_Return)
                 {
-
+                    ToBeOutput = Choices;
 
                     Console.CursorVisible = false;
                     Console.SetCursorPosition(0, 0);
-                    Console.Write(NxtLine + Space);
+                    Console.Write(NxtLine);
 
-                    if (pointer == 1)
+                    if (In_Settings )
                     {
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                        ToBeOutput = SettingChoices;
                     }
-                    Console.Write("Play\n");
-
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                    if (pointer == 2)
+                    
+                    for (int i = 1; i < ToBeOutput.Length; i++)
                     {
-                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write(Space);
+                        if (i == pointer)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                        }
+                        Console.Write(ToBeOutput[i]+"\n");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
-                    Console.Write(Space + "Information\n");
-
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                    if (pointer == 3)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                    }
-
-                    Console.Write(Space + "Exit\n");
-                    Console.ForegroundColor = ConsoleColor.White;
 
                 }
 
@@ -111,51 +110,65 @@ namespace ConsoleApp1
        
         static void Menu_Movement()
         {
+            low = 1;
+            high = 3;
             do
             {
                 if (Will_Return)
                 {
-                    ConsoleKeyInfo r = Console.ReadKey(true);
-
+                    r = Console.ReadKey(true);
+                    
 
                     switch (r.Key)
                     {
                         case ConsoleKey.UpArrow:
-                            if (pointer > 1)
+                            if (pointer > low)
                             {
                                 pointer--;
                             }
                             break;
                         case ConsoleKey.DownArrow:
-                            if (pointer < 3)
+                            if (pointer <= high)
                             {
                                 pointer++;
                             }
                             break;
                         case ConsoleKey.Enter:
 
-                            switch (pointer)
+                            if (!In_Settings)
                             {
-                                case 1:
-                                    In_Menu = false;
-                                    config();
+                                switch (pointer)
+                                {
+                                    case 1:
+                                        In_Menu = false;
+                                        config();
 
-                                    Spiel_Starten();
-                                    Console.Clear();
-                                    break;
+                                        Spiel_Starten();
+                                        Console.Clear();
+                                        break;
 
-                                case 2:
-                                    Will_Return = false;
-                                    Info_Screen();
-                                    Will_Return = true;
+                                    case 2:
+                                        Will_Return = false;
+                                        Info_Screen();
+                                        Will_Return = true;
 
-                                    break;
-                                case 3:
-                                    System.Environment.Exit(0);
+                                        break;
+                                    case 3:
+                                        
+                                        pointer = 1;
+                                        high = 1;
+                                        In_Settings = true;
 
-                                    break;
-                                default:
-                                    break;
+                                        Task Settings = Task.Factory.StartNew(() => Settings_Menu());
+
+                                        break;
+
+                                    case 4:
+                                        System.Environment.Exit(0);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
 
                             break;
@@ -171,12 +184,105 @@ namespace ConsoleApp1
                 
            
         }
+        static void Settings_Menu()
+        {
+            r = new ConsoleKeyInfo();
+            int[] FieldChoices = { 15,30,45 };
+            int x = 15;
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            do
+            {
+                
+                switch (r.Key)
+                {
+                    case ConsoleKey.Enter:
+                        switch (pointer)
+                        {
+                            case 1:
+                                Will_Return=false;
+                                
+                                while (!Will_Return )
+                                {
+                                    Console.Clear();
+                                    Console.SetCursorPosition(0, 0);
+                                    Console.Write(NxtLine+Space);
+
+                                    for (int i = 0; i < FieldChoices.Length; i++)
+                                    {
+                                        
+                                        if (x == FieldChoices[i] )
+                                        {
+                                            Console.ForegroundColor = ConsoleColor.Blue;
+                                        }
+                                        Console.Write(FieldChoices[i] + "    ");
+                                        Console.ForegroundColor = ConsoleColor.White;
+
+                                        
+                                    }
+                                    r = Console.ReadKey(true);
+                                    switch (r.Key)
+                                    {
+                                        case ConsoleKey.RightArrow:
+                                            if (x < 45)
+                                            {
+                                                x += 15;
+                                            }
+                                            break;
+
+                                        case ConsoleKey.LeftArrow:
+
+                                            if (x > 15)
+                                            {
+                                                x -= 15;
+                                            }
+                                            break;
+                                        case ConsoleKey.Enter:
+                                            r = new ConsoleKeyInfo();
+
+                                            Will_Return = true;
+                                            FeldGröße.y = x;
+                                            FeldGröße.x = x;
+                                            manualfield = true;
+                                            
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                }
+                                
+                                break;
+
+                            case 2:
+                                
+                                high = 3;
+                                pointer = 1;
+                                In_Settings = false;
+                                Console.Clear();
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            } while (In_Settings);
+
+            
+
+            Console.Clear();
+
+        }
         static void Info_Screen()
         {
             Console.Clear();
+            
             string Txt = Space+"This Small Game was inspired from Undertale. \n" + Space +"Credits :\n\n"+Space+ "猫Vondalo猫#0002 \n"+Space+"Davs#1607";
 
-
+            Console.SetCursorPosition(0, 0);
             for (int i = 0; i < Txt.Length; i++)
             {
                 Console.Write(Txt[i]);
@@ -190,9 +296,15 @@ namespace ConsoleApp1
 
         static void config()
         {
+            Console.Clear();
             Console.CursorVisible = false;
-            FeldGröße.x = 30; FeldGröße.y = 30;
-            Feld = new int[30,30];
+            if (!manualfield)
+            {
+                FeldGröße.x = 15; FeldGröße.y = 15;
+            }
+            
+
+            Feld = new int[FeldGröße.y,FeldGröße.x];
             Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
 
             for (int i = 0; i < FeldGröße.x; i++)
@@ -425,7 +537,7 @@ namespace ConsoleApp1
             while (läuft)
             {
                 attacke = true;
-                Thread.Sleep(990);
+                Thread.Sleep(600);
                 int Seite = Seiten_Auswahl.Next(1, 5);
                 Array.Resize(ref Pfeile, Pfeile.Length+1);
                 Pfeile[Pfeile.Length - 1].richtung = Seite;
