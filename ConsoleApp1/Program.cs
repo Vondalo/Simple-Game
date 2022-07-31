@@ -40,6 +40,7 @@ namespace ConsoleApp1
         static ConsoleKeyInfo r;
         static int low, high;
         static bool manualfield = false;
+        static ConsoleKeyInfo f;
         static void Main(string[] args)
         {
             Menu();
@@ -50,9 +51,9 @@ namespace ConsoleApp1
         
         static void Menu()
         {
-            
 
-           
+
+
             
         
             
@@ -101,6 +102,7 @@ namespace ConsoleApp1
                         Console.Write(ToBeOutput[i]+"\n");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
+                    
 
                 }
 
@@ -385,7 +387,7 @@ namespace ConsoleApp1
 
                 Console.Write("\n                             HP : ");
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(hp+ " " +"Score : "+ score+"         ");
+                Console.Write(hp+ " " +"Score : "+ score+"   "+Kebab+"         ");
                 Console.ForegroundColor = ConsoleColor.White;
                 if (hp <= 0)
                 {
@@ -404,6 +406,7 @@ namespace ConsoleApp1
         {
             Thread.Sleep(2000);
             Console.Clear();
+            Console.SetCursorPosition(0, 0);
             string text = "You Lost!"+  NxtLine+Space ;
             for (int i = 0; i < text.Length; i++)
             {
@@ -430,6 +433,7 @@ namespace ConsoleApp1
             Task Bewegen = Task.Factory.StartNew(() => Movement());
             Task Pfeile_Spawner = Task.Factory.StartNew(() => Arrow_Shooter());
             Task Pfeile_Bewegen = Task.Factory.StartNew(() => Arrows_Bewegen());
+            Task Nothing = Task.Factory.StartNew(() => Davud_stinkt());
             Task.WaitAll(feldausgaben,Bewegen, Pfeile_Spawner,Pfeile_Bewegen);
         }
 
@@ -439,10 +443,10 @@ namespace ConsoleApp1
             {
 
                 ConsoleKeyInfo input = Console.ReadKey(true);
-
+                f = input;
                 switch (input.Key)
                 {
-                    case ConsoleKey.UpArrow:
+                    case ConsoleKey.UpArrow  :
                         if (attacke)
                         {
                             Schild_Löschen();
@@ -579,7 +583,7 @@ namespace ConsoleApp1
             int zustand = 0;
             while (läuft)
             {
-                Thread.Sleep(200);
+                Thread.Sleep(100);
 
                 for (int i = 0; i <= FeldGröße.y-2; i++)
                 {
@@ -846,6 +850,57 @@ namespace ConsoleApp1
                     }
                 }
             }
+        }
+        static string Kebab = "";
+        static void Davud_stinkt()
+        {
+            bool ins = false;
+            
+            Task Time = Task.Factory.StartNew(()=> Timer());
+            while (läuft)
+            {
+                
+                
+
+                if ((int)f.Key >= 65 && (int)f.Key <= 90)
+                {
+                    Kebab += f.Key.ToString().ToLower();
+                    ins = true;
+                }
+                if (Kebab == "lukassmolpp")
+                {
+                    
+                  
+                    
+                    hp = 99999;
+                    
+                    break;
+                }
+                if (ins)
+                {
+                    f = new ConsoleKeyInfo();
+                    ins = false;
+                }
+            }
+        }
+
+        static void Timer()
+        {
+
+            while (läuft)
+            {
+                int time = 0;
+
+                while (time < 5)
+                {
+                    Thread.Sleep(1000);
+                    time++;
+                }
+                Kebab = "";
+                
+            }
+            
+
         }
     }
 }
